@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Fireball.gd" type="Script" id=1]
+[ext_resource path="res://Assets/fire.png" type="Texture" id=2]
+
+[sub_resource type="CanvasItemMaterial" id=2]
+
+blend_mode = 1
+
+[sub_resource type="Curve" id=3]
+
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.2624 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CircleShape2D" id=1]
+
+radius = 1.58112
+
+[node name="Fireball" type="Area2D"]
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+show_behind_parent = true
+material = SubResource( 2 )
+rotation = -1.5708
+scale = Vector2( 0.1, 0.1 )
+amount = 25
+lifetime = 0.2
+speed_scale = 0.5
+local_coords = false
+texture = ExtResource( 2 )
+emission_shape = 1
+emission_sphere_radius = 5.0
+spread = 0.0
+gravity = Vector2( 0, 0 )
+initial_velocity = 50.0
+angular_velocity = 350.0
+angular_velocity_random = 1.0
+linear_accel = 10.0
+scale_amount_curve = SubResource( 3 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
+
+[node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_Fireball_body_entered"]
+[connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_screen_exited"]
