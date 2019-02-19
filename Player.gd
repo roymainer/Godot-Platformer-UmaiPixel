@@ -7,8 +7,10 @@ enum ACTIONS {
 	STANDING, 
 	CROUCHING, 
 	JUMPING, 
+	DOUBLE_JUMPING,
 	FALLING,
 	ATTACKING, 
+	AIR_ATTACK1,
 	CASTING,
 	SWORD_SEATH
 }
@@ -26,9 +28,12 @@ var velocity = Vector2()
 
 var current_action = null
 var is_sword_out = false
+var can_double_jump = true  # this is used for double jump
+var double_jumping = false  # this is used for double jump
 
 
 func get_input():
+	
 	
 	""" RUNNING """
 	if current_action != ACTIONS.ATTACKING and current_action != ACTIONS.CASTING:
@@ -67,7 +72,7 @@ func get_input():
 					print("starting slide timer")
 					slide_timer.start()
 			stand_col_shape.disabled = true
-		else:
+		elif not $tunnel_detector.is_colliding():
 			stand_col_shape.disabled = false
 					
 		if (Input.is_action_just_released("ui_down") or Input.is_action_just_released("s_pressed")):
@@ -76,20 +81,36 @@ func get_input():
 			
 			
 		""" JUMPING """
-		if Input.is_action_just_pressed("ui_up") and is_on_floor():#  and current_action != ACTIONS.ATTACKING:
-			velocity.y = JUMP_POWER
-		if velocity.y < 0:
-			current_action = ACTIONS.JUMPING
-		elif velocity.y > 0 and not is_on_floor():
+		if Input.is_action_just_pressed("ui_up") and current_action != ACTIONS.SLIDING:
+			if is_on_floor():
+				velocity.y = JUMP_POWER
+				double_jumping = false
+				can_double_jump = true
+			elif not is_on_floor() and can_double_jump:
+				velocity.y = JUMP_POWER
+				double_jumping = true
+				can_double_jump = false
+				
+		if velocity.y < 0 and current_action != ACTIONS.AIR_ATTACK1:
+			if not double_jumping:
+				current_action = ACTIONS.JUMPING
+			else:
+				current_action = ACTIONS.DOUBLE_JUMPING
+		elif velocity.y > 0 and not is_on_floor() and current_action != ACTIONS.AIR_ATTACK1 and not $tunnel_detector.is_colliding():
 			current_action = ACTIONS.FALLING
 		
 	""" Normal Attacking """
 	if Input.is_action_just_pressed("ui_focus_next") and current_action != ACTIONS.CASTING: # and not is_attacking and is_on_floor():
-		if abs(velocity.x) > 0:
-			velocity.x -= sign($Position2D.position.x)*SPEED/2  # slow down when attacking
-		current_action = ACTIONS.ATTACKING
 		is_sword_out = true
 		get_node("sword_seath_timer").stop()
+		
+		if is_on_floor():
+			if abs(velocity.x) > 0:
+				velocity.x -= sign($Position2D.position.x)*SPEED/2  # slow down when attacking
+			current_action = ACTIONS.ATTACKING
+		else:
+			current_action = ACTIONS.AIR_ATTACK1
+		
 		
 	""" Casting """
 	if Input.is_action_just_pressed("ui_select") and current_action != ACTIONS.ATTACKING: # and not is_attacking:
@@ -101,6 +122,13 @@ func get_input():
 		fireball.set_fireball_direction(sign($Position2D.position.x) == 1)
 		fireball.global_position = get_node("Position2D").global_position
 	
+	if $tunnel_detector.is_colliding() and is_on_floor():
+		if velocity.x != 0:
+			current_action = ACTIONS.SLIDING
+		else:
+			current_action = ACTIONS.CROUCHING
+	
+	
 	match current_action:
 		ACTIONS.IDLE:
 			if not is_sword_out:
@@ -109,24 +137,35 @@ func get_input():
 				anim_player.play("idle_sword")
 		ACTIONS.RUNNING:
 			anim_player.play("run")
+#			print("run")
 		ACTIONS.CROUCHING:
 			anim_player.play("crouch")
+#			print("crouch")
 		ACTIONS.SLIDING:
 			anim_player.play("slide")
+#			print("slide")
 		ACTIONS.STANDING:
 			anim_player.play("stand")
+#			print("stand")
 		ACTIONS.JUMPING:
 			anim_player.play("jump")
+#			print("jump")
+		ACTIONS.DOUBLE_JUMPING:
+			anim_player.play("air_flip")
+#			print("double jump")
 		ACTIONS.FALLING:
 			anim_player.play("fall")
+#			print("fall")
 		ACTIONS.ATTACKING:
 			anim_player.play("attack_light")
+		ACTIONS.AIR_ATTACK1:
+			anim_player.play("air_attack_1")
 		ACTIONS.CASTING:
 			anim_player.play("cast")
-			print("Casting")
 		ACTIONS.SWORD_SEATH:
 			anim_player.play("sword_seath")
-			print("returning sword")
+			
+		
 	
 
 #warning-ignore:unused_argument
@@ -142,6 +181,10 @@ func _on_animation_finished():
 	var animation = anim_player.get_animation()
 	if animation == "sword_seath":
 		is_sword_out = false
+	elif animation == "flip":
+		double_jumping = false
+	elif animation == "air_attack_1":
+		current_action = ACTIONS.FALLING
 #	pass
 
 func _on_slide_timer_timeout():

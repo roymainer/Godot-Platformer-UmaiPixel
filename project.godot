@@ -74,6 +74,14 @@ s_pressed={
  ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Background"
+2d_physics/layer_2="Tiles"
+2d_physics/layer_3="Player"
+2d_physics/layer_4="Enemies"
+2d_physics/layer_5="Projectile"
+
 [rendering]
 
 quality/driver/driver_name="GLES2"

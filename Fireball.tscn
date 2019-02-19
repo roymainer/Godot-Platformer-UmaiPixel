@@ -3,19 +3,21 @@
 [ext_resource path="res://Fireball.gd" type="Script" id=1]
 [ext_resource path="res://Assets/fire.png" type="Texture" id=2]
 
-[sub_resource type="CanvasItemMaterial" id=2]
+[sub_resource type="CanvasItemMaterial" id=1]
 
 blend_mode = 1
 
-[sub_resource type="Curve" id=3]
+[sub_resource type="Curve" id=2]
 
 _data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.2624 ), 0.0, 0.0, 0, 0 ]
 
-[sub_resource type="CircleShape2D" id=1]
+[sub_resource type="CircleShape2D" id=3]
 
 radius = 1.58112
 
 [node name="Fireball" type="Area2D"]
+collision_layer = 16
+collision_mask = 10
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_group_": true
@@ -23,7 +25,7 @@ __meta__ = {
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
 show_behind_parent = true
-material = SubResource( 2 )
+material = SubResource( 1 )
 rotation = -1.5708
 scale = Vector2( 0.1, 0.1 )
 amount = 25
@@ -39,10 +41,10 @@ initial_velocity = 50.0
 angular_velocity = 350.0
 angular_velocity_random = 1.0
 linear_accel = 10.0
-scale_amount_curve = SubResource( 3 )
+scale_amount_curve = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource( 1 )
+shape = SubResource( 3 )
 
 [node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
 

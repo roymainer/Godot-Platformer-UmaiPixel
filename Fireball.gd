@@ -22,4 +22,6 @@ func _on_screen_exited():
 	queue_free()
 
 func _on_Fireball_body_entered(body):
+	if "Enemy" in body.name:
+		body.dead()
 	queue_free()
