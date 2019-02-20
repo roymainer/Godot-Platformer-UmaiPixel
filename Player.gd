@@ -71,9 +71,13 @@ func get_input():
 				if slide_timer.time_left == 0:
 					print("starting slide timer")
 					slide_timer.start()
+			
 			stand_col_shape.disabled = true
-		elif not $tunnel_detector.is_colliding():
+#			print("stand collision shape disabled")
+			
+		elif is_on_floor() and not $tunnel_detector.is_colliding():
 			stand_col_shape.disabled = false
+#			print("stand collision shape enabled")
 					
 		if (Input.is_action_just_released("ui_down") or Input.is_action_just_released("s_pressed")):
 			get_node("slide_timer").stop()
@@ -127,7 +131,6 @@ func get_input():
 			current_action = ACTIONS.SLIDING
 		else:
 			current_action = ACTIONS.CROUCHING
-	
 	
 	match current_action:
 		ACTIONS.IDLE:

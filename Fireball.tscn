@@ -1,19 +1,78 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Fireball.gd" type="Script" id=1]
 [ext_resource path="res://Assets/fire.png" type="Texture" id=2]
 
-[sub_resource type="CanvasItemMaterial" id=1]
+[sub_resource type="CanvasItemMaterial" id=2]
 
 blend_mode = 1
 
-[sub_resource type="Curve" id=2]
+[sub_resource type="Curve" id=3]
 
-_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.2624 ), 0.0, 0.0, 0, 0 ]
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.2844 ), 0.0, 0.0, 0, 0 ]
 
-[sub_resource type="CircleShape2D" id=3]
+[sub_resource type="CurveTexture" id=4]
+
+curve = SubResource( 3 )
+
+[sub_resource type="GradientTexture" id=5]
+
+
+[sub_resource type="ParticlesMaterial" id=6]
+
+trail_color_modifier = SubResource( 5 )
+emission_shape = 1
+emission_sphere_radius = 5.0
+flag_disable_z = true
+spread = 0.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 150.0
+angular_velocity = 350.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = 10.0
+scale_curve = SubResource( 4 )
+
+[sub_resource type="CircleShape2D" id=1]
 
 radius = 1.58112
+
+[sub_resource type="CanvasItemMaterial" id=7]
+
+blend_mode = 1
+
+[sub_resource type="Curve" id=8]
+
+_data = [ Vector2( 0, 0.9356 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.3812 ), -1.15164, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=9]
+
+curve = SubResource( 8 )
+
+[sub_resource type="Curve" id=10]
+
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.0336 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=11]
+
+curve = SubResource( 10 )
+
+[sub_resource type="ParticlesMaterial" id=12]
+
+trail_size_modifier = SubResource( 11 )
+emission_shape = 1
+emission_sphere_radius = 5.0
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 5.0
+angular_velocity = 2.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = 1.0
+radial_accel = 35.0
+tangential_accel = 5.0
+scale_curve = SubResource( 9 )
 
 [node name="Fireball" type="Area2D"]
 collision_layer = 16
@@ -23,30 +82,41 @@ __meta__ = {
 "_edit_group_": true
 }
 
-[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
-show_behind_parent = true
-material = SubResource( 1 )
+[node name="Particles2D" type="Particles2D" parent="."]
+material = SubResource( 2 )
 rotation = -1.5708
 scale = Vector2( 0.1, 0.1 )
 amount = 25
-lifetime = 0.2
+lifetime = 0.1
 speed_scale = 0.5
 local_coords = false
+process_material = SubResource( 6 )
 texture = ExtResource( 2 )
-emission_shape = 1
-emission_sphere_radius = 5.0
-spread = 0.0
-gravity = Vector2( 0, 0 )
-initial_velocity = 50.0
-angular_velocity = 350.0
-angular_velocity_random = 1.0
-linear_accel = 10.0
-scale_amount_curve = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource( 3 )
+shape = SubResource( 1 )
 
 [node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
 
+[node name="explosion_timer" type="Timer" parent="."]
+wait_time = 0.8
+one_shot = true
+
+[node name="screen_exited_timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="explosion" type="Particles2D" parent="."]
+material = SubResource( 7 )
+emitting = false
+amount = 60
+lifetime = 0.8
+one_shot = true
+speed_scale = 3.0
+local_coords = false
+process_material = SubResource( 12 )
+texture = ExtResource( 2 )
+
 [connection signal="body_entered" from="." to="." method="_on_Fireball_body_entered"]
 [connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_screen_exited"]
+[connection signal="timeout" from="explosion_timer" to="." method="_on_explosion_timer_timeout"]
+[connection signal="timeout" from="screen_exited_timer" to="." method="_on_screen_exited_timer_timeout"]
