@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Effects/Heal.gd" type="Script" id=1]
+
+[sub_resource type="Gradient" id=1]
+
+offsets = PoolRealArray( 0, 0.356589, 1 )
+colors = PoolColorArray( 1, 1, 1, 1, 0, 1, 0.0862745, 1, 0.12549, 0.411765, 0.14902, 0.47451 )
+
+[sub_resource type="GradientTexture" id=2]
+
+gradient = SubResource( 1 )
+
+[sub_resource type="Curve" id=3]
+
+_data = [ Vector2( 0, 1 ), 0.0, 0.109215, 0, 0, Vector2( 1, 0.467 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=4]
+
+curve = SubResource( 3 )
+
+[sub_resource type="ParticlesMaterial" id=5]
+
+emission_shape = 2
+emission_box_extents = Vector3( 10, 1, 1 )
+flag_disable_z = true
+spread = 0.0
+gravity = Vector3( 0, -98, 0 )
+angular_velocity = 473.42
+angular_velocity_random = 0.25
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 2.5
+scale_curve = SubResource( 4 )
+color_ramp = SubResource( 2 )
+
+[node name="Heal" type="Particles2D"]
+z_index = 10
+amount = 100
+lifetime = 0.6
+local_coords = false
+process_material = SubResource( 5 )
+script = ExtResource( 1 )
+
