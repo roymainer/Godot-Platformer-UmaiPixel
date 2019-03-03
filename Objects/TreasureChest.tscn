@@ -1,0 +1,78 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://Objects/TreasureChest.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Objects/treasure1_1.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Objects/treasure1_2.png" type="Texture" id=3]
+[ext_resource path="res://Assets/Objects/treasure1_3.png" type="Texture" id=4]
+[ext_resource path="res://Assets/Objects/coin_gold.png" type="Texture" id=5]
+
+[sub_resource type="SpriteFrames" id=1]
+
+animations = [ {
+"frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ) ],
+"loop": false,
+"name": "open",
+"speed": 8.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=2]
+
+extents = Vector2( 6.88985, 5.2807 )
+
+[sub_resource type="Curve" id=3]
+
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.61 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=4]
+
+curve = SubResource( 3 )
+
+[sub_resource type="ParticlesMaterial" id=5]
+
+emission_shape = 2
+emission_box_extents = Vector3( 10, 45, 1 )
+flag_disable_z = true
+spread = 30.0
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 50.0
+angular_velocity = 20.0
+angular_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = 25.0
+radial_accel = 10.0
+angle = 90.0
+scale_curve = SubResource( 4 )
+
+[node name="TreasureChest" type="Area2D"]
+collision_layer = 32
+collision_mask = 4
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+frames = SubResource( 1 )
+animation = "open"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0.0965691, 2.80054 )
+shape = SubResource( 2 )
+
+[node name="gold_coin_emitter" type="Particles2D" parent="."]
+position = Vector2( -3.09648e-016, 0.0871582 )
+rotation = -1.5708
+scale = Vector2( 0.1, 0.1 )
+amount = 25
+lifetime = 2.0
+process_material = SubResource( 5 )
+texture = ExtResource( 5 )
+
+[node name="gold_coin_emitter_timer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_TreasureChest_body_entered"]
+[connection signal="animation_finished" from="AnimatedSprite" to="." method="_on_animation_finished"]
+[connection signal="timeout" from="gold_coin_emitter_timer" to="." method="_on_gold_coin_emitter_timer_timeout"]

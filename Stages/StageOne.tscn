@@ -1,7 +1,7 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://UI/HUD.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Background_TileMap.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_07_1920 x 1080.png" type="Texture" id=4]
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_06_1920 x 1080.png" type="Texture" id=5]
@@ -10,8 +10,11 @@
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_03_1920 x 1080.png" type="Texture" id=8]
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_02_1920 x 1080.png" type="Texture" id=9]
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_01_1920 x 1080.png" type="Texture" id=10]
-[ext_resource path="res://Enemies/skeleton_green.tscn" type="PackedScene" id=11]
-[ext_resource path="res://Enemies/skeleton_white.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Stages/ScreenShake.gd" type="Script" id=11]
+[ext_resource path="res://Stages/change_stage.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Objects/TreasureChest.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Enemies/skeleton_green.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Enemies/skeleton_white.tscn" type="PackedScene" id=15]
 
 [node name="StageOne" type="Node2D"]
 position = Vector2( 0, -16 )
@@ -94,25 +97,73 @@ texture = ExtResource( 10 )
 centered = false
 offset = Vector2( 0, -250 )
 
-[node name="skeleton_green" parent="." instance=ExtResource( 11 )]
-position = Vector2( 352, 48 )
+[node name="ScreenShake" type="Node2D" parent="."]
+script = ExtResource( 11 )
 
-[node name="skeleton_green2" parent="." instance=ExtResource( 11 )]
-position = Vector2( 688, 144 )
+[node name="Tween" type="Tween" parent="ScreenShake"]
 
-[node name="skeleton_green3" parent="." instance=ExtResource( 11 )]
-position = Vector2( 784, -48 )
+[node name="Objects" type="Node2D" parent="."]
 
-[node name="skeleton_green4" parent="." instance=ExtResource( 11 )]
-position = Vector2( 944, 144 )
+[node name="change_stage" parent="Objects" instance=ExtResource( 12 )]
+position = Vector2( 1110, 56 )
+target_stage = "res://Stages/StageTwo.tscn"
 
-[node name="skeleton_white" parent="." instance=ExtResource( 12 )]
-position = Vector2( 208, 144 )
+[node name="TreasureChest" parent="Objects" instance=ExtResource( 13 )]
+position = Vector2( 527.586, 55.636 )
 
-[node name="skeleton_white2" parent="." instance=ExtResource( 12 )]
-position = Vector2( 208, 48 )
+[node name="TreasureChest2" parent="Objects" instance=ExtResource( 13 )]
+position = Vector2( 808.319, -40.2665 )
+
+[node name="TreasureChest3" parent="Objects" instance=ExtResource( 13 )]
+position = Vector2( 96, 103.855 )
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="skeleton_green" parent="Enemies" instance=ExtResource( 14 )]
+position = Vector2( 196.73, 47.3557 )
+experience = 30
+
+[node name="skeleton_green2" parent="Enemies" instance=ExtResource( 14 )]
+position = Vector2( 213.481, 143.352 )
+experience = 30
+
+[node name="skeleton_green3" parent="Enemies" instance=ExtResource( 14 )]
+position = Vector2( 363.597, 46.7115 )
+experience = 30
+
+[node name="skeleton_white" parent="Enemies" instance=ExtResource( 15 )]
+position = Vector2( 667.467, 143.673 )
+max_health = 75
+damage = 15
+experience = 20
+
+[node name="skeleton_white2" parent="Enemies" instance=ExtResource( 15 )]
+position = Vector2( 719.009, 143.029 )
+max_health = 75
+damage = 15
+experience = 20
+
+[node name="skeleton_white3" parent="Enemies" instance=ExtResource( 15 )]
+position = Vector2( 842.71, -47.032 )
+max_health = 75
+damage = 15
+experience = 20
+
+[node name="skeleton_white4" parent="Enemies" instance=ExtResource( 15 )]
+position = Vector2( 937.418, 143.673 )
+max_health = 200
+damage = 20
+experience = 40
+size = Vector2( 2, 2 )
 
 [connection signal="armor_changed" from="Player" to="HUD" method="update_armorbar"]
 [connection signal="energy_changed" from="Player" to="HUD" method="update_energybar"]
+[connection signal="gold_changed" from="Player" to="HUD" method="_on_Player_gold_changed"]
 [connection signal="health_changed" from="Player" to="HUD" method="update_healthbar"]
+[connection signal="level_changed" from="Player" to="HUD" method="_on_Player_level_changed"]
 [connection signal="spell_changed" from="Player" to="HUD" method="_on_Player_spell_changed"]
+[connection signal="xp_changed" from="Player" to="HUD" method="_on_Player_xp_changed"]
+[connection signal="tween_completed" from="ScreenShake/Tween" to="ScreenShake" method="_on_tween_completed"]
+[connection signal="enemy_dead" from="Enemies/skeleton_green" to="Player" method="_on_enemy_dead"]
+[connection signal="enemy_dead" from="Enemies/skeleton_green2" to="Player" method="_on_enemy_dead"]
+[connection signal="enemy_dead" from="Enemies/skeleton_green3" to="Player" method="_on_enemy_dead"]

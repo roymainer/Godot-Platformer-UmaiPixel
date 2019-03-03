@@ -13,27 +13,41 @@ onready var player_detector_front = get_node("player_detector_front")
 onready var player_detector_back = get_node("player_detector_back")
 onready var player_in_range = get_node("player_in_range_detector")
 
+# Constants
 const SPEED = 20
 const MAX_SPEED = 40
 const GRAVITY = 10
 const FLOOR = Vector2(0, -1)
-const MAX_HEALTH = 50
-const DAMAGE = 10
 const VISIBILITY_FRONT = 80
 const VISIBILITY_BACK = 35
 
+# Variables
 var velocity = Vector2()
 var current_action = null
 var direction = 1  # track the enemy's direction (1 = right)
-export (int) var max_health = MAX_HEALTH
 var health
 var is_dead = false
 var is_hurt = false
 
+# Exported variables
+export (int) var max_health = 50
+export (int) var damage = 10
+export (int) var experience = 10
+export (Vector2) var size = Vector2(1,1)
+
+# signals
 signal health_changed
+signal enemy_dead
 
 
 func _ready():
+	scale = size
+	if scale > Vector2(1,1):
+		var frame = $AnimatedSprite.frames.get_frame("idle", 0)
+		var frame_size = frame.get_size()
+		player_detector_back.global_position.y += frame_size.y / 2 
+		player_detector_front.global_position.y += frame_size.y / 2 
+		player_in_range.global_position.y += frame_size.y / 2
 	current_action = ACTIONS.WALK
 	health = max_health
 
@@ -142,8 +156,8 @@ func _change_direction():
 
 func hit(damage):
 	health -= damage
-	health = clamp(health, 0, MAX_HEALTH)
-	emit_signal("health_changed", health * 100/MAX_HEALTH)
+	health = clamp(health, 0, max_health)
+	emit_signal("health_changed", health * 100/max_health)
 	
 	current_action = ACTIONS.HURT
 	is_hurt = true
@@ -168,6 +182,10 @@ func dead():
 	$edge_detector.queue_free()
 	$UnitDisplay.hide()
 	$after_death_timer.start()
+	if scale > Vector2(1,1):
+		# if enemy is large
+		get_parent().get_parent().get_node("ScreenShake").screen_shake(1, 10, 100)
+	emit_signal("enemy_dead", experience)
 
 func _on_after_death_timer_timeout():
 	queue_free()
@@ -192,7 +210,7 @@ func _on_frame_changed():
 			if collider.name == "Player":
 				velocity.x = 0
 				current_action = ACTIONS.ATTACK
-				collider.hit(DAMAGE)  # only hit if the player is in range by the time the animation finishes
+				collider.hit(damage)  # only hit if the player is in range by the time the animation finishes
 	
 func _on_visibility_timer_timeout():
 	# return the visibility detectors to original values

@@ -58,10 +58,14 @@ const CAMERA_OFFSET = 40
 # Attributes
 export (int) var max_health = 100
 export (int) var max_energy = 100
+export (int) var energy_regen_rate = 5
 export (int) var max_armor = 100
 var health = max_health
 var energy = max_energy
 var armor = max_armor
+var gold = 0
+var experience = 0
+var level = 1
 
 var velocity = Vector2()
 
@@ -75,10 +79,18 @@ var is_hurt = false
 var is_casting = false
 var is_loop_casting = false
 
+# debug
+var animation = null
+var frame = null
+var iterations = null
+
 signal health_changed
 signal energy_changed
 signal armor_changed
 signal spell_changed
+signal gold_changed
+signal xp_changed
+signal level_changed
 
 
 func _ready():
@@ -117,7 +129,7 @@ func get_input():
 			velocity.x = 0
 			if is_on_floor() == true and current_action != ACTIONS.ATTACKING and current_action != ACTIONS.SWORD_SEATH and not is_hurt:
 				current_action = ACTIONS.IDLE
-				var sword_timer = get_node("sword_seath_timer")
+				var sword_timer = $Timers/sword_seath_timer
 				if is_sword_out and sword_timer.time_left == 0:
 #					print("starting sword seath timer")
 					sword_timer.start()
@@ -126,9 +138,9 @@ func get_input():
 		if Input.is_action_pressed("ui_down") and is_on_floor():
 			if velocity.x == 0:
 				current_action = ACTIONS.CROUCHING
-			elif get_node("slide_cooldown_timer").time_left == 0:
+			elif $Timers/slide_cooldown_timer.time_left == 0:
 				current_action = ACTIONS.SLIDING
-				var slide_timer = get_node("slide_timer")
+				var slide_timer = $Timers/slide_timer
 				if slide_timer.time_left == 0:
 #					print("starting slide timer")
 					slide_timer.start()
@@ -141,8 +153,8 @@ func get_input():
 #			print("stand collision shape enabled")
 #		
 		if Input.is_action_just_released("ui_down"):
-			get_node("slide_timer").stop()
-			get_node("slide_cooldown_timer").stop()
+			$Timers/slide_timer.stop()
+			$Timers/slide_cooldown_timer.stop()
 			
 			
 		""" JUMPING """
@@ -170,7 +182,7 @@ func get_input():
 	""" Normal Attacking """
 	if Input.is_action_just_pressed("attack") and current_action != ACTIONS.CASTING: # and not is_attacking and is_on_floor():
 		is_sword_out = true
-		get_node("sword_seath_timer").stop()
+		$Timers/sword_seath_timer.stop()
 		if is_on_floor():
 			if abs(velocity.x) > 0:
 				velocity.x -= sign($player_cast_position_2d.position.x)*SPEED/2  # slow down when attacking
@@ -255,9 +267,8 @@ func animate():
 			anim_player.play("cast")
 		ACTIONS.CAST_LOOP:
 			anim_player.play("cast_loop")
-			print(str($cast_loop_timer.wait_time))
-			if $cast_loop_timer.time_left == 0:
-				$cast_loop_timer.start()
+			if $Timers/cast_loop_timer.time_left == 0:
+				$Timers/cast_loop_timer.start()
 		ACTIONS.SWORD_SEATH:
 			anim_player.play("sword_seath")
 		ACTIONS.HURT:
@@ -295,6 +306,17 @@ func _physics_process(delta):
 #				if "Enemy" in get_slide_collision(i).collider.name:
 #					# if collided with enemy body
 #					dead()
+
+		# make sure the player doesn't stuck
+		if animation != $AnimatedSprite.animation:
+			animation = $AnimatedSprite.animation
+			frame = $AnimatedSprite.frame
+			iterations = 0
+		elif frame != $AnimatedSprite.frame:
+			iterations = 0
+		if animation == $AnimatedSprite.animation and frame == $AnimatedSprite.frame and iterations == 1:
+			current_action = ACTIONS.IDLE
+		
 			
 
 func attack():
@@ -323,9 +345,6 @@ func cast():
 	if is_casting:
 		return
 	
-	is_casting = true
-	current_action = ACTIONS.CASTING
-	
 	var spell = null
 	var energy_cost =  spells_dict[current_spell]["energy"]
 	var spell_global_position = null
@@ -333,11 +352,6 @@ func cast():
 		# if spell requires more energy than the player has, return
 		# TODO: change the color of the energy bar to red and back
 		return		
-	
-	# update player energy
-	energy -= energy_cost  
-	energy = clamp(energy, 0, max_energy)
-	emit_signal("energy_changed", energy * 100 / max_energy)
 	
 	# instance spell and change action
 	if current_spell == SPELLS.FIREBALL or current_spell == SPELLS.FROSTBALL:
@@ -352,8 +366,9 @@ func cast():
 #		print("spell_pos: " + str(spell_position))
 #		print("spell_global_pos: " +str(spell_global_position))
 	
-		
 	elif current_spell == SPELLS.HEAL:
+		if not is_on_floor():
+			return
 		spell = HEAL.instance()
 		health += spell.get_health()
 		health = clamp(health, 0, max_health)
@@ -366,6 +381,14 @@ func cast():
 	spell.global_position = spell_global_position
 	if abs(velocity.x) > 0:
 		velocity.x -= sign($player_cast_position_2d.position.x)*SPEED/2  # slow down when casting
+		
+	# update player energy
+	energy -= energy_cost  
+	energy = clamp(energy, 0, max_energy)
+	emit_signal("energy_changed", energy * 100 / max_energy)
+	
+	is_casting = true
+	current_action = ACTIONS.CASTING
 	
 func dead():
 	is_dead = true
@@ -373,10 +396,10 @@ func dead():
 	current_action = ACTIONS.DEAD
 	$crouch_collision_shape.disabled = true
 	$stand_collision_shape.disabled = true
-	$death_timer.start()
+	$Timers/death_timer.start()
 
 func _on_animation_finished():
-	if $cast_loop_timer.time_left > 0:
+	if $Timers/cast_loop_timer.time_left > 0:
 		return
 	current_action = ACTIONS.IDLE
 	var animation = anim_player.get_animation()
@@ -401,7 +424,7 @@ func _on_slide_timer_timeout():
 #	print("slide timer stopped")
 	velocity.x = 0
 	current_action = ACTIONS.STANDING
-	get_node("slide_cooldown_timer").start()
+	$Timers/slide_cooldown_timer.start()
 
 func _on_sword_seath_timer_timeout():
 #	print("time to put sword back")
@@ -422,3 +445,23 @@ func _on_cast_loop_timer_timeout():
 	# eliminate the spell effect (particle)
 	var spell = get_parent().get_node("Heal")
 	spell.queue_free()
+
+
+func _on_energy_regen_timer_timeout():
+	energy += energy_regen_rate
+	energy = clamp(energy, 0, max_energy)
+	emit_signal("energy_changed", energy)
+
+
+func update_gold(amount):
+	gold += amount
+	emit_signal("gold_changed", gold)
+
+
+func _on_enemy_dead(xp):
+	experience += xp
+	if experience >= pow(10, level+1):
+		level += 1
+		experience = experience - pow(10, level+1)
+		emit_signal("level_changed", level)
+	emit_signal("xp_changed", experience * 100 / pow(10, level+1))

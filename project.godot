@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Godot-Platformer-UmaiPixel"
-run/main_scene="res://StageOne.tscn"
+run/main_scene="res://Stages/StageOne.tscn"
 config/icon="res://icon.png"
 
 [display]
@@ -118,6 +118,7 @@ heavy_attack={
 2d_physics/layer_3="Player"
 2d_physics/layer_4="Enemies"
 2d_physics/layer_5="Projectile"
+2d_physics/layer_6="Objects"
 
 [rendering]
 
