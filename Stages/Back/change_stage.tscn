@@ -1,14 +1,21 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Stages/change_stage.gd" type="Script" id=1]
+[ext_resource path="res://Stages/Back/change_stage.gd" type="Script" id=1]
 [ext_resource path="res://Assets/sheet.png" type="Texture" id=2]
+
 
 [sub_resource type="RectangleShape2D" id=1]
 
-extents = Vector2( 4.79569, 3.61787 )
+extents = Vector2( 6.80898, 6.02054 )
 
 [node name="change_stage" type="Area2D"]
+monitoring = false
+collision_layer = 32
+collision_mask = 4
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 2 )
@@ -16,7 +23,7 @@ region_enabled = true
 region_rect = Rect2( 224, 16, 16, 16 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 0.223701, 1.61065 )
+position = Vector2( 0, 2 )
 shape = SubResource( 1 )
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

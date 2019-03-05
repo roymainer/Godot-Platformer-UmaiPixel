@@ -58,7 +58,7 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.5, 0.8 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
-"values": [ Vector2( 0.294812, 0.344022 ), Vector2( 0.6, 0.7 ), Vector2( 0.294812, 0.344022 ) ]
+"values": [ Vector2( 0.3, 0.35 ), Vector2( 0.6, 0.7 ), Vector2( 0.3, 0.35 ) ]
 }
 tracks/1/type = "value"
 tracks/1/path = NodePath("MarginContainer/VBoxContainer/HBoxContainer2/SpellBarRect/RichTextLabel:rect_scale")
@@ -157,7 +157,7 @@ scroll_active = false
 
 [node name="icon_sprite" type="Sprite" parent="MarginContainer/VBoxContainer/HBoxContainer2/SpellBarRect"]
 position = Vector2( 13.9608, 14.596 )
-scale = Vector2( 0.6, 0.7 )
+scale = Vector2( 0.3, 0.35 )
 texture = ExtResource( 9 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]

@@ -22,7 +22,7 @@ scale = Vector2( 0.3, 0.3 )
 transform = Transform2D( 0.3, 0, 0, 0.3, 0, 0 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 64, 144 )
+position = Vector2( 64, 141 )
 
 [node name="TileMap" parent="." instance=ExtResource( 3 )]
 z_index = 14

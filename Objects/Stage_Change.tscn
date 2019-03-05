@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Objects/Stage_Change.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Objects/arrow_sign1.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+
+extents = Vector2( 6.88985, 5.2807 )
+
+[node name="Stage_Change" type="Area2D"]
+collision_layer = 32
+collision_mask = 4
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+target_stage = "res://Stages/StageTwo.tscn"
+
+[node name="AnimatedSprite" type="Sprite" parent="."]
+texture = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0.0965691, 2.80054 )
+shape = SubResource( 1 )
+
+[connection signal="body_entered" from="." to="." method="_on_Stage_Change_body_entered"]

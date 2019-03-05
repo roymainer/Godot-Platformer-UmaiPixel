@@ -49,7 +49,8 @@ func _on_Player_gold_changed(value):
 
 
 func _on_Player_level_changed(lvl):
-	$MarginContainer/VBoxContainer/HBoxContainer3/ExperienceBar/Level.text = "LV." + str(lvl)
+	var new_string = str("LV.", str(lvl))
+	$MarginContainer/VBoxContainer/HBoxContainer3/ExperienceRect/Level.text = new_string
 	#TODO: add size tween
 
 

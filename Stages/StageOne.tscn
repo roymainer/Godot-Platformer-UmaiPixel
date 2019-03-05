@@ -11,8 +11,8 @@
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_02_1920 x 1080.png" type="Texture" id=9]
 [ext_resource path="res://Assets/Backgrounds/dark_forest/layer_01_1920 x 1080.png" type="Texture" id=10]
 [ext_resource path="res://Stages/ScreenShake.gd" type="Script" id=11]
-[ext_resource path="res://Stages/change_stage.tscn" type="PackedScene" id=12]
-[ext_resource path="res://Objects/TreasureChest.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Objects/TreasureChest.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Objects/Stage_Change.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Enemies/skeleton_green.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Enemies/skeleton_white.tscn" type="PackedScene" id=15]
 
@@ -104,18 +104,17 @@ script = ExtResource( 11 )
 
 [node name="Objects" type="Node2D" parent="."]
 
-[node name="change_stage" parent="Objects" instance=ExtResource( 12 )]
-position = Vector2( 1110, 56 )
-target_stage = "res://Stages/StageTwo.tscn"
-
-[node name="TreasureChest" parent="Objects" instance=ExtResource( 13 )]
+[node name="TreasureChest" parent="Objects" instance=ExtResource( 12 )]
 position = Vector2( 527.586, 55.636 )
 
-[node name="TreasureChest2" parent="Objects" instance=ExtResource( 13 )]
+[node name="TreasureChest2" parent="Objects" instance=ExtResource( 12 )]
 position = Vector2( 808.319, -40.2665 )
 
-[node name="TreasureChest3" parent="Objects" instance=ExtResource( 13 )]
+[node name="TreasureChest3" parent="Objects" instance=ExtResource( 12 )]
 position = Vector2( 96, 103.855 )
+
+[node name="Stage_Change" parent="Objects" instance=ExtResource( 13 )]
+position = Vector2( 1090.1, 55.636 )
 
 [node name="Enemies" type="Node2D" parent="."]
 
@@ -167,3 +166,7 @@ size = Vector2( 2, 2 )
 [connection signal="enemy_dead" from="Enemies/skeleton_green" to="Player" method="_on_enemy_dead"]
 [connection signal="enemy_dead" from="Enemies/skeleton_green2" to="Player" method="_on_enemy_dead"]
 [connection signal="enemy_dead" from="Enemies/skeleton_green3" to="Player" method="_on_enemy_dead"]
+[connection signal="enemy_dead" from="Enemies/skeleton_white" to="Player" method="_on_enemy_dead"]
+[connection signal="enemy_dead" from="Enemies/skeleton_white2" to="Player" method="_on_enemy_dead"]
+[connection signal="enemy_dead" from="Enemies/skeleton_white3" to="Player" method="_on_enemy_dead"]
+[connection signal="enemy_dead" from="Enemies/skeleton_white4" to="Player" method="_on_enemy_dead"]
